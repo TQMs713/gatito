@@ -95,13 +95,18 @@
     @media (max-width: 768px) {
       .panel { right: -100vw; width: 100vw; overflow-y: auto; overflow-x: hidden; }
       .panel .panel-header { padding: 25px 18px 15px; }
-      .panel .panel-section { padding: 14px 18px; }
+      .panel .panel-section { padding: 12px 14px; }
       .panel .panel-name { font-size: 20px; }
       .panel .section-title { font-size: 14px; }
-      .story-original { font-size: 12px; padding: 10px; }
-      .story-card { padding: 10px; }
-      .story-header { padding: 10px; }
+      .story-original { font-size: 12px; padding: 8px; word-break: break-word; }
+      .story-card { padding: 8px; }
+      .story-header { padding: 8px; }
+      .bio-content { padding: 0; }
       .panel .info-row { flex-direction: column; gap: 4px; }
+      /* 表格类自适应 */
+      .panel [style*="flex:1"], .panel [style*="flex: 1"] { flex: 1 1 50% !important; font-size: 11px !important; }
+      .panel [style*="display:flex"] { flex-wrap: wrap; }
+      .panel .panel-section p { font-size: 13px; line-height: 1.6; }
       .splash-title { font-size: 32px; letter-spacing: 12px; }
       .splash-sub-cn { font-size: 16px; letter-spacing: 8px; }
       .splash-btn { padding: 14px 40px; font-size: 14px; }
