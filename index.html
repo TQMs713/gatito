@@ -91,6 +91,28 @@
       backdrop-filter: blur(40px);
     }
     .panel.show { right: 0; }
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+      .panel { right: -100vw; width: 100vw; overflow-y: auto; overflow-x: hidden; }
+      .panel .panel-header { padding: 25px 18px 15px; }
+      .panel .panel-section { padding: 14px 18px; }
+      .panel .panel-name { font-size: 20px; }
+      .panel .section-title { font-size: 14px; }
+      .story-original { font-size: 12px; padding: 10px; }
+      .story-card { padding: 10px; }
+      .story-header { padding: 10px; }
+      .panel .info-row { flex-direction: column; gap: 4px; }
+      .splash-title { font-size: 32px; letter-spacing: 12px; }
+      .splash-sub-cn { font-size: 16px; letter-spacing: 8px; }
+      .splash-btn { padding: 14px 40px; font-size: 14px; }
+      .top-bar { padding: 0 15px; }
+      .logo { font-size: 13px; letter-spacing: 3px; }
+      .logo-sub { font-size: 9px; letter-spacing: 5px; }
+      .hint { font-size: 10px; bottom: 12px; }
+      .gen-selector { display: none; }
+      .controls { gap: 6px; }
+      .ctrl-btn { font-size: 10px; padding: 4px 10px; }
+    }
     .panel-close { 
       position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; 
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
