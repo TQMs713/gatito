@@ -763,6 +763,8 @@
 
       renderer.domElement.addEventListener('mousemove', onMouseMove);
       renderer.domElement.addEventListener('click', onClick);
+      renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+      renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
       window.addEventListener('resize', onResize);
 
       renderGenSelector();
@@ -1120,6 +1122,71 @@
       } else {
         tip.style.display = 'none';
         renderer.domElement.style.cursor = 'grab';
+      }
+    }
+
+    function onTouchStart(e) {
+      e.preventDefault();
+      const t = e.touches[0];
+      mouse.x = (t.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(t.clientY / window.innerHeight) * 2 + 1;
+      // 模拟点击
+      raycaster.setFromCamera(mouse, camera);
+      const hitMeshes = planets.map(p => p.mesh);
+      celestialObjects.forEach(co => { hitMeshes.push(co.mesh); if (co.glow) co.glow.forEach(g => hitMeshes.push(g)); if (co.core) hitMeshes.push(co.core); if (co.hitBox) hitMeshes.push(co.hitBox); });
+      const hits = raycaster.intersectObjects(hitMeshes);
+      if (hits.length > 0) {
+        const obj = hits[0].object;
+        const data = obj.userData;
+        if (data.type === 'celestial') { openEncyclopediaDetail(data.kind, data.id); return; }
+        if (data.character) { openPanel(data.character); }
+      }
+    }
+    
+    function onTouchMove(e) {
+      e.preventDefault();
+      const t = e.touches[0];
+      mouse.x = (t.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(t.clientY / window.innerHeight) * 2 + 1;
+      // 模拟悬停检测（简化版）
+      raycaster.setFromCamera(mouse, camera);
+      const hitMeshes = planets.map(p => p.mesh);
+      celestialObjects.forEach(co => { hitMeshes.push(co.mesh); if (co.glow) co.glow.forEach(g => hitMeshes.push(g)); if (co.core) hitMeshes.push(co.core); if (co.hitBox) hitMeshes.push(co.hitBox); });
+      const hits = raycaster.intersectObjects(hitMeshes);
+      planets.forEach(p => { p.mesh.material.emissiveIntensity = 0.3; p.glow.material.opacity = 0.06; if (p.label) p.label.classList.remove('show'); });
+      if (hits.length > 0) {
+        const hitData = hits[0].object.userData;
+        if (hitData.type === 'celestial') {
+          celestialObjects.forEach(co => { const isHit = co.mesh === hits[0].object || (co.glow && co.glow.includes(hits[0].object)) || co.core === hits[0].object || co.hitBox === hits[0].object; co.mesh.material.opacity = isHit ? 1 : 0.7; if (co.glow) co.glow.forEach(g => { if (g.material) g.material.opacity = isHit ? 1 : 0.4; }); if (co.core) co.core.material.opacity = isHit ? 1 : 0.6; });
+          document.getElementById('tooltipName').textContent = hitData.name || '';
+          document.getElementById('tooltipGen').textContent = (hitData.kind === 'event' ? '◆ 事件星云' : '✦ 名物星座');
+        } else {
+          celestialObjects.forEach(co => { co.mesh.material.opacity = 0.7; if (co.glow) co.glow.forEach(g => { if (g.material) g.material.opacity = 0.4; }); if (co.core) co.core.material.opacity = 0.6; });
+          const ch = hits[0].object.userData.character;
+          if (ch) {
+            const planet = planets.find(p => p.character.id === ch.id);
+            if (planet) {
+              planet.mesh.material.emissiveIntensity = 0.9;
+              planet.glow.material.opacity = 0.35;
+              if (planet.label) {
+                const pos = toScreenPos(planet.mesh);
+                planet.label.style.left = pos.x + 'px';
+                planet.label.style.top = (pos.y - 15) + 'px';
+                planet.label.classList.add('show');
+              }
+              ch.rel.forEach(r => { const rp = planets.find(p => p.character.id === r.t); if (rp) { rp.mesh.material.emissiveIntensity = 0.5; rp.glow.material.opacity = 0.12; } });
+            }
+            document.getElementById('tooltipName').textContent = ch.name;
+            document.getElementById('tooltipGen').textContent = '第' + ch.gen + '代 · ' + ch.sym;
+          }
+        }
+        document.getElementById('tooltip').style.display = 'block';
+        document.getElementById('tooltip').style.left = t.clientX + 15 + 'px';
+        document.getElementById('tooltip').style.top = t.clientY + 15 + 'px';
+        renderer.domElement.style.cursor = 'pointer';
+      } else {
+        document.getElementById('tooltip').style.display = 'none';
+        celestialObjects.forEach(co => { co.mesh.material.opacity = 0.7; if (co.glow) co.glow.forEach(g => { if (g.material) g.material.opacity = 0.4; }); if (co.core) co.core.material.opacity = 0.6; });
       }
     }
 
